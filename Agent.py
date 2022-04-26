@@ -10,7 +10,9 @@ class Agent:
 		self.nodeLocationID = nID
 		# Target location
 		self.targetID = targetID
-		self.tour = [0,1,2,3,4,5,6,7,8,18,28,38,48]
+		self.tour = self.nMap.biDir_BFS(nID, targetID)
+		print(self.tour)
+		# self.tour = [0,1,2,3,4,5,6,7,8,18,28,38,48]
 
 	# Well-defined position update
 	def updatePosition(self, dx, dy):
@@ -25,12 +27,8 @@ class Agent:
 			self.nodeLocationID = self.tour[0]
 			self.tour.pop(0)
 		elif self.nodeLocationID == self.targetID:
-			self.tour = [48,58,68,78,88,98,99]
+			# Find new path to a goal node (the first goal node)
+			self.tour = self.nMap.biDir_BFS(self.nodeLocationID, self.nMap.goalNodes[0])
 		elif self.nMap.goalNodes.count(self.nodeLocationID) > 0:
 			return True
 		return False
-
-		# # For now, just make random moves
-		# rnd = random.random()
-		# if rnd <= 0.5:
-		# 	self.nodeLocationID = random.choice(self.nMap.nodeMap[self.nodeLocationID].neighbors)

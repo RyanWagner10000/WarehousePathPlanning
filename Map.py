@@ -117,3 +117,44 @@ class WHMap:
 		map_array = np.array(whMap, dtype=np.uint8)
 		plt.imshow(map_array, interpolation='nearest')
 		plt.pause(0.01)
+
+	def biDir_BFS(self, startID, endID):
+		print("Find path: ", startID, endID)
+		root = [None] * self.rows * self.columns
+		for r in range(0, len(root)):
+			root[r] = -1
+
+		queue = []
+		root[startID] = startID
+		queue.append(startID)
+
+		while queue:
+			n = queue.pop(0)
+			print(n, ":")
+
+			for nbr in self.nodeMap[n].neighbors:
+				print(nbr, end=" ")
+				if root[nbr] == -1:
+					root[nbr] = n
+					queue.append(nbr)
+					if nbr == endID:
+						# Found node!
+						print("Found node!")
+						queue = []
+						break
+			print("")
+
+		# Determine resulting tour
+		result = []
+		crNode = endID
+		result.append(crNode)
+		print("Resulting tour:")
+		print(" ", crNode, end=" ")
+		while not crNode == startID:
+			crNode = root[crNode]
+			result.insert(0, crNode)
+			print(crNode, end=" ")
+
+		print("")
+		print(result)
+		return result
