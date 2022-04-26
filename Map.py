@@ -1,7 +1,5 @@
 from matplotlib import pyplot as plt
 import numpy as np
-from PIL import Image
-import os
 import csv
 
 
@@ -12,36 +10,77 @@ RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 
 
+class Node(object):
+	def __init__(self, id):
+		self.id = id
+		self.neighbors = []
+		self.type = None
+
+
 class WHMap:
 	# Class constructor
 	def __init__(self):
-		path = os.getcwd() + "\\map.xlsx"
 		self.results = []
+		# Read map from .csv
 		with open("map.csv") as csvfile:
 			reader = csv.reader(csvfile)  # change contents to floats
 			for row in reader:  # each row is a list
 				self.results.append(row)
+		self.rows = len(self.results)
+		self.columns = len(self.results[0])
+		# Create node map
+		self.nodeMap = [None] * self.rows * self.columns
+		for r in range(0, self.rows):
+			for c in range(0, self.columns):
+				# Set node ID
+				id = r * self.columns + c
+				node = Node(id)
+				# Set node type
+				node.type = self.results[r][c]
+				# Add node to list
+				self.nodeMap[id] = node
 
-		# map_array = np.array(self.whMap, dtype=np.uint8)
-		#
-		# plt.imshow(map_array, interpolation='nearest')
-		# plt.show()
-		#
-		# self.map_image = Image.fromarray(map_array)
-		# self.map_image = self.map_image.resize((500, 500), resample=Image.NEAREST)
+		# Create neighbors list for each node
+		for r in range(0, self.rows):
+			for c in range(0, self.columns):
+				id = r * self.columns + c
+				# Check each neighbor
+				if r - 1 >= 0:
+					ngID = (r-1) * self.columns + c
+					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
+						self.nodeMap[id].neighbors.append(ngID)
+				if c + 1 < self.columns:
+					ngID = r * self.columns + (c+1)
+					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
+						self.nodeMap[id].neighbors.append(ngID)
+				if r + 1 < self.rows:
+					ngID = (r+1) * self.columns + c
+					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
+						self.nodeMap[id].neighbors.append(ngID)
+				if c - 1 >= 0:
+					ngID = r * self.columns + (c-1)
+					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
+						self.nodeMap[id].neighbors.append(ngID)
+
+		# Sanity prints
+		for n in self.nodeMap:
+			print(n.id, " : ", n.neighbors)
 
 	def updateMap(self, agentQueue):
+		# Create current warehouse map
 		whMap = []
-		for r in range(0, len(self.results)):
+		for r in range(0, self.rows):
 			row = []
-			for c in range(0, len(self.results[0])):
-				if self.results[r][c] == '':
+			for c in range(0, self.columns):
+				# Determine what color this node should be
+				id = r * self.columns + c
+				if self.nodeMap[id].type == 'E':
 					row.append(WHITE)
-				elif self.results[r][c] == 'x':
+				elif self.nodeMap[id].type == 'X':
 					row.append(BLACK)
-				elif self.results[r][c] == 's':
+				elif self.nodeMap[id].type == 'S':
 					row.append(BLUE)
-				elif self.results[r][c] == 'g':
+				elif self.nodeMap[id].type == 'G':
 					row.append(YELLOW)
 				else:
 					print("No color detected")
@@ -51,13 +90,7 @@ class WHMap:
 		for agent in agentQueue:
 			whMap[agent.X][agent.Y] = RED
 
+		# Display map
 		map_array = np.array(whMap, dtype=np.uint8)
 		plt.imshow(map_array, interpolation='nearest')
-		plt.pause(0.05)
-		# plt.show6()
-		# # Add robots here!
-		# map_array = np.array(currentMap, dtype=np.uint8)
-		# self.map_image = Image.fromarray(map_array)
-		# self.map_image = self.map_image.resize((500, 500), resample=Image.NEAREST)
-		# # self.map_image.save("map.png")
-		# self.map_image.show()
+		plt.pause(0.01)
