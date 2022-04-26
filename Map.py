@@ -3,11 +3,17 @@ import numpy as np
 import csv
 
 
+# Grid colors
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 204)
 YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
+# Node types
+EMPTY = 'E'
+START = 'S'
+SHELF = 'X'
+GOAL = 'G'
 
 
 class Node(object):
@@ -20,14 +26,16 @@ class Node(object):
 class WHMap:
 	# Class constructor
 	def __init__(self):
-		self.results = []
+		results = []
 		# Read map from .csv
 		with open("map.csv") as csvfile:
 			reader = csv.reader(csvfile)  # change contents to floats
 			for row in reader:  # each row is a list
-				self.results.append(row)
-		self.rows = len(self.results)
-		self.columns = len(self.results[0])
+				results.append(row)
+		self.rows = len(results)
+		self.columns = len(results[0])
+		self.startNodes = []
+		self.goalNodes = []
 		# Create node map
 		self.nodeMap = [None] * self.rows * self.columns
 		for r in range(0, self.rows):
@@ -36,35 +44,49 @@ class WHMap:
 				id = r * self.columns + c
 				node = Node(id)
 				# Set node type
-				node.type = self.results[r][c]
+				node.type = results[r][c]
 				# Add node to list
 				self.nodeMap[id] = node
-
+				# Check if this is a start node
+				if node.type == START:
+					# Add node to start node list
+					self.startNodes.append(id)
+				# Check if this is a goal node
+				if node.type == GOAL:
+					# Add node to goal node list
+					self.goalNodes.append(id)
 		# Create neighbors list for each node
 		for r in range(0, self.rows):
 			for c in range(0, self.columns):
 				id = r * self.columns + c
-				# Check each neighbor
-				if r - 1 >= 0:
-					ngID = (r-1) * self.columns + c
-					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
-						self.nodeMap[id].neighbors.append(ngID)
-				if c + 1 < self.columns:
-					ngID = r * self.columns + (c+1)
-					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
-						self.nodeMap[id].neighbors.append(ngID)
-				if r + 1 < self.rows:
-					ngID = (r+1) * self.columns + c
-					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
-						self.nodeMap[id].neighbors.append(ngID)
-				if c - 1 >= 0:
-					ngID = r * self.columns + (c-1)
-					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
-						self.nodeMap[id].neighbors.append(ngID)
+				# Verify this isn't a shelf
+				if not self.nodeMap[id].type == SHELF:
+					# Check each neighbor
+					if r - 1 >= 0:
+						ngID = (r-1) * self.columns + c
+						if not self.nodeMap[ngID].type == SHELF:
+							self.nodeMap[id].neighbors.append(ngID)
+					if c + 1 < self.columns:
+						ngID = r * self.columns + (c+1)
+						if not self.nodeMap[ngID].type == SHELF:
+							self.nodeMap[id].neighbors.append(ngID)
+					if r + 1 < self.rows:
+						ngID = (r+1) * self.columns + c
+						if not self.nodeMap[ngID].type == SHELF:
+							self.nodeMap[id].neighbors.append(ngID)
+					if c - 1 >= 0:
+						ngID = r * self.columns + (c-1)
+						if not self.nodeMap[ngID].type == SHELF:
+							self.nodeMap[id].neighbors.append(ngID)
 
 		# Sanity prints
 		for n in self.nodeMap:
 			print(n.id, " : ", n.neighbors)
+
+	def idToRC(self, id):
+		r = id // self.columns
+		c = id - (self.columns * r)
+		return r, c
 
 	def updateMap(self, agentQueue):
 		# Create current warehouse map
@@ -74,13 +96,13 @@ class WHMap:
 			for c in range(0, self.columns):
 				# Determine what color this node should be
 				id = r * self.columns + c
-				if self.nodeMap[id].type == 'E':
+				if self.nodeMap[id].type == EMPTY:
 					row.append(WHITE)
-				elif self.nodeMap[id].type == 'X':
+				elif self.nodeMap[id].type == SHELF:
 					row.append(BLACK)
-				elif self.nodeMap[id].type == 'S':
+				elif self.nodeMap[id].type == START:
 					row.append(BLUE)
-				elif self.nodeMap[id].type == 'G':
+				elif self.nodeMap[id].type == GOAL:
 					row.append(YELLOW)
 				else:
 					print("No color detected")
@@ -88,7 +110,8 @@ class WHMap:
 
 		# Add robots to map
 		for agent in agentQueue:
-			whMap[agent.X][agent.Y] = RED
+			R, C = self.idToRC(agent.nodeLocationID)
+			whMap[R][C] = RED
 
 		# Display map
 		map_array = np.array(whMap, dtype=np.uint8)
