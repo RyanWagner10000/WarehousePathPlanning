@@ -3,11 +3,17 @@ import numpy as np
 import csv
 
 
+# Grid colors
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 204)
 YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
+# Node types
+EMPTY = 'E'
+START = 'S'
+SHELF = 'X'
+GOAL = 'G'
 
 
 class Node(object):
@@ -47,19 +53,19 @@ class WHMap:
 				# Check each neighbor
 				if r - 1 >= 0:
 					ngID = (r-1) * self.columns + c
-					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
+					if not self.nodeMap[ngID].type == SHELF:
 						self.nodeMap[id].neighbors.append(ngID)
 				if c + 1 < self.columns:
 					ngID = r * self.columns + (c+1)
-					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
+					if not self.nodeMap[ngID].type == SHELF:
 						self.nodeMap[id].neighbors.append(ngID)
 				if r + 1 < self.rows:
 					ngID = (r+1) * self.columns + c
-					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
+					if not self.nodeMap[ngID].type == SHELF:
 						self.nodeMap[id].neighbors.append(ngID)
 				if c - 1 >= 0:
 					ngID = r * self.columns + (c-1)
-					if self.nodeMap[ngID].type == 'E' or self.nodeMap[ngID].type == 'S' or self.nodeMap[ngID].type == 'G':
+					if not self.nodeMap[ngID].type == SHELF:
 						self.nodeMap[id].neighbors.append(ngID)
 
 		# Sanity prints
@@ -74,13 +80,13 @@ class WHMap:
 			for c in range(0, self.columns):
 				# Determine what color this node should be
 				id = r * self.columns + c
-				if self.nodeMap[id].type == 'E':
+				if self.nodeMap[id].type == EMPTY:
 					row.append(WHITE)
-				elif self.nodeMap[id].type == 'X':
+				elif self.nodeMap[id].type == SHELF:
 					row.append(BLACK)
-				elif self.nodeMap[id].type == 'S':
+				elif self.nodeMap[id].type == START:
 					row.append(BLUE)
-				elif self.nodeMap[id].type == 'G':
+				elif self.nodeMap[id].type == GOAL:
 					row.append(YELLOW)
 				else:
 					print("No color detected")
