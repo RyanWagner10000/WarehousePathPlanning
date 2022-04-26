@@ -26,14 +26,14 @@ class Node(object):
 class WHMap:
 	# Class constructor
 	def __init__(self):
-		self.results = []
+		results = []
 		# Read map from .csv
 		with open("map.csv") as csvfile:
 			reader = csv.reader(csvfile)  # change contents to floats
 			for row in reader:  # each row is a list
-				self.results.append(row)
-		self.rows = len(self.results)
-		self.columns = len(self.results[0])
+				results.append(row)
+		self.rows = len(results)
+		self.columns = len(results[0])
 		# Create node map
 		self.nodeMap = [None] * self.rows * self.columns
 		for r in range(0, self.rows):
@@ -42,7 +42,7 @@ class WHMap:
 				id = r * self.columns + c
 				node = Node(id)
 				# Set node type
-				node.type = self.results[r][c]
+				node.type = results[r][c]
 				# Add node to list
 				self.nodeMap[id] = node
 
@@ -72,6 +72,11 @@ class WHMap:
 		for n in self.nodeMap:
 			print(n.id, " : ", n.neighbors)
 
+	def idToRC(self, id):
+		r = id // self.columns
+		c = id - (self.columns * r)
+		return r, c
+
 	def updateMap(self, agentQueue):
 		# Create current warehouse map
 		whMap = []
@@ -94,7 +99,8 @@ class WHMap:
 
 		# Add robots to map
 		for agent in agentQueue:
-			whMap[agent.X][agent.Y] = RED
+			R, C = self.idToRC(agent.nodeLocationID)
+			whMap[R][C] = RED
 
 		# Display map
 		map_array = np.array(whMap, dtype=np.uint8)

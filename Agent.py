@@ -3,11 +3,13 @@ import random
 
 class Agent:
 	# Class constructor. id is agent ID, x,y are agents initial position on grid
-	def __init__(self, id, x=0, y=0):
+	def __init__(self, id, nMap, x=0, y=0, nID=0):
 		self.ID = id
+		self.nMap = nMap
 		# Starting position of agent
 		self.X = x
 		self.Y = y
+		self.nodeLocationID = nID
 
 	# Well-defined position update
 	def updatePosition(self, dx, dy):
@@ -21,11 +23,5 @@ class Agent:
 
 		# For now, just make random moves
 		rnd = random.random()
-		if rnd < 0.1:
-			self.updatePosition(1, 0)
-		elif rnd < 0.2:
-			self.updatePosition(-1, 0)
-		elif rnd < 0.3:
-			self.updatePosition(0, 1)
-		elif rnd < 0.4:
-			self.updatePosition(0, -1)
+		if rnd <= 0.5:
+			self.nodeLocationID = random.choice(self.nMap.nodeMap[self.nodeLocationID].neighbors)

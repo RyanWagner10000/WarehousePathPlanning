@@ -12,7 +12,7 @@ def runTSUpdates(queue, ids, whMap):
 	if rnd < 0.1:
 		# Create a new agent
 		print("Creating new agent ", ids)
-		queue.append(Agent.Agent(ids))
+		queue.append(Agent.Agent(ids, whMap))
 		ids += 1
 
 	# Run updates on each agent
