@@ -9,15 +9,16 @@ def runTSUpdates(queue, ids, whMap):
 
 	# Randomly generate new agents
 	rnd = random.random()
-	if rnd < 0.1:
+	if rnd < 0.25:
 		# Create a new agent
 		print("Creating new agent ", ids)
-		queue.append(Agent.Agent(ids, whMap))
+		queue.append(Agent.Agent(ids, whMap, 0, 48))
 		ids += 1
 
 	# Run updates on each agent
 	for agent in queue:
-		agent.update()
+		if agent.update():
+			queue.remove(agent)
 
 	# Update grid-world display
 	whMap.updateMap(queue)

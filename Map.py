@@ -34,6 +34,8 @@ class WHMap:
 				results.append(row)
 		self.rows = len(results)
 		self.columns = len(results[0])
+		self.startNodes = []
+		self.goalNodes = []
 		# Create node map
 		self.nodeMap = [None] * self.rows * self.columns
 		for r in range(0, self.rows):
@@ -45,28 +47,37 @@ class WHMap:
 				node.type = results[r][c]
 				# Add node to list
 				self.nodeMap[id] = node
-
+				# Check if this is a start node
+				if node.type == START:
+					# Add node to start node list
+					self.startNodes.append(id)
+				# Check if this is a goal node
+				if node.type == GOAL:
+					# Add node to goal node list
+					self.goalNodes.append(id)
 		# Create neighbors list for each node
 		for r in range(0, self.rows):
 			for c in range(0, self.columns):
 				id = r * self.columns + c
-				# Check each neighbor
-				if r - 1 >= 0:
-					ngID = (r-1) * self.columns + c
-					if not self.nodeMap[ngID].type == SHELF:
-						self.nodeMap[id].neighbors.append(ngID)
-				if c + 1 < self.columns:
-					ngID = r * self.columns + (c+1)
-					if not self.nodeMap[ngID].type == SHELF:
-						self.nodeMap[id].neighbors.append(ngID)
-				if r + 1 < self.rows:
-					ngID = (r+1) * self.columns + c
-					if not self.nodeMap[ngID].type == SHELF:
-						self.nodeMap[id].neighbors.append(ngID)
-				if c - 1 >= 0:
-					ngID = r * self.columns + (c-1)
-					if not self.nodeMap[ngID].type == SHELF:
-						self.nodeMap[id].neighbors.append(ngID)
+				# Verify this isn't a shelf
+				if not self.nodeMap[id].type == SHELF:
+					# Check each neighbor
+					if r - 1 >= 0:
+						ngID = (r-1) * self.columns + c
+						if not self.nodeMap[ngID].type == SHELF:
+							self.nodeMap[id].neighbors.append(ngID)
+					if c + 1 < self.columns:
+						ngID = r * self.columns + (c+1)
+						if not self.nodeMap[ngID].type == SHELF:
+							self.nodeMap[id].neighbors.append(ngID)
+					if r + 1 < self.rows:
+						ngID = (r+1) * self.columns + c
+						if not self.nodeMap[ngID].type == SHELF:
+							self.nodeMap[id].neighbors.append(ngID)
+					if c - 1 >= 0:
+						ngID = r * self.columns + (c-1)
+						if not self.nodeMap[ngID].type == SHELF:
+							self.nodeMap[id].neighbors.append(ngID)
 
 		# Sanity prints
 		for n in self.nodeMap:
