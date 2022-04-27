@@ -36,6 +36,7 @@ class WHMap:
 		self.columns = len(results[0])
 		self.startNodes = []
 		self.goalNodes = []
+		self.targetNodes = []
 		# Create node map
 		self.nodeMap = [None] * self.rows * self.columns
 		for r in range(0, self.rows):
@@ -70,6 +71,8 @@ class WHMap:
 						ngID = r * self.columns + (c+1)
 						if not self.nodeMap[ngID].type == SHELF:
 							self.nodeMap[id].neighbors.append(ngID)
+						elif self.nodeMap[id].type == EMPTY:
+							self.targetNodes.append(id)
 					if r + 1 < self.rows:
 						ngID = (r+1) * self.columns + c
 						if not self.nodeMap[ngID].type == SHELF:
@@ -78,6 +81,8 @@ class WHMap:
 						ngID = r * self.columns + (c-1)
 						if not self.nodeMap[ngID].type == SHELF:
 							self.nodeMap[id].neighbors.append(ngID)
+						elif self.nodeMap[id].type == EMPTY:
+							self.targetNodes.append(id)
 
 		# Sanity prints
 		for n in self.nodeMap:

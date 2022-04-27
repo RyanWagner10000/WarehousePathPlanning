@@ -12,7 +12,6 @@ class Agent:
 		self.targetID = targetID
 		self.tour = self.nMap.biDir_BFS(nID, targetID)
 		print(self.tour)
-		# self.tour = [0,1,2,3,4,5,6,7,8,18,28,38,48]
 
 	# Well-defined position update
 	def updatePosition(self, dx, dy):
