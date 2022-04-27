@@ -29,7 +29,7 @@ class WHMap:
 	def __init__(self):
 		results = []
 		# Read map from .csv
-		with open("map.csv") as csvfile:
+		with open("map1.csv") as csvfile:
 			reader = csv.reader(csvfile)  # change contents to floats
 			for row in reader:  # each row is a list
 				results.append(row)
@@ -117,7 +117,10 @@ class WHMap:
 		# Add robots to map
 		for agent in agentQueue:
 			R, C = self.idToRC(agent.nodeLocationID)
-			whMap[R][C] = RED
+			red = list(RED)
+			red[2] = (agent.ID * 35) % 255
+			red[1] = (agent.ID * 10) % 150
+			whMap[R][C] = tuple(red)
 
 		# Display map
 		map_array = np.array(whMap, dtype=np.uint8)

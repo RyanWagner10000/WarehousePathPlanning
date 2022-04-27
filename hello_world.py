@@ -25,7 +25,7 @@ def runTSUpdates(queue, ids, whMap):
 	# Update grid-world display
 	whMap.updateMap(queue)
 
-	time.sleep(0.5)
+	time.sleep(0.05)
 	return queue, ids
 
 
