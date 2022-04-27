@@ -138,12 +138,6 @@ class WHMap:
 		c = id - (self.columns * r)
 		return r, c
 
-	UP = 'U'
-	DOWN = 'D'
-	LEFT = 'L'
-	RIGHT = 'R'
-
-
 	def updateMap(self, agentQueue):
 		# Create current warehouse map
 		whMap = []
