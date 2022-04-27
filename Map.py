@@ -29,7 +29,7 @@ class WHMap:
 	def __init__(self):
 		results = []
 		# Read map from .csv
-		with open("map1.csv") as csvfile:
+		with open("map2.csv") as csvfile:
 			reader = csv.reader(csvfile)  # change contents to floats
 			for row in reader:  # each row is a list
 				results.append(row)

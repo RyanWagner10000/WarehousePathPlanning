@@ -25,7 +25,7 @@ def runTSUpdates(queue, ids, whMap):
 	# Update grid-world display
 	whMap.updateMap(queue)
 
-	time.sleep(0.05)
+	time.sleep(0.1)
 	return queue, ids
 
 
@@ -36,5 +36,5 @@ if __name__ == '__main__':
 	whMap = WHMap()
 
 	# Main simulation loop, runs once per time-step
-	while True:
+	for i in range(0, 500):
 		agentQueue, agentIDs = runTSUpdates(agentQueue, agentIDs, whMap)
