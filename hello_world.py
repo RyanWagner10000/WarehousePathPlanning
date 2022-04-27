@@ -12,7 +12,9 @@ def runTSUpdates(queue, ids, whMap):
 	if rnd < 0.25:
 		# Create a new agent
 		print("Creating new agent ", ids)
-		queue.append(Agent.Agent(ids, whMap, 0, 48))
+		queue.append(Agent.Agent(ids, whMap, random.choice(whMap.startNodes),
+		                         random.choice(whMap.targetNodes),
+		                         random.choice(whMap.goalNodes)))
 		ids += 1
 
 	# Run updates on each agent
@@ -23,7 +25,7 @@ def runTSUpdates(queue, ids, whMap):
 	# Update grid-world display
 	whMap.updateMap(queue)
 
-	time.sleep(0.5)
+	time.sleep(0.1)
 	return queue, ids
 
 
@@ -34,5 +36,5 @@ if __name__ == '__main__':
 	whMap = WHMap()
 
 	# Main simulation loop, runs once per time-step
-	while True:
+	for i in range(0, 500):
 		agentQueue, agentIDs = runTSUpdates(agentQueue, agentIDs, whMap)

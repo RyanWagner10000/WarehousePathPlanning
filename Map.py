@@ -21,6 +21,7 @@ class Node(object):
 		self.id = id
 		self.neighbors = []
 		self.type = None
+		self.occupied = False
 
 
 class WHMap:
@@ -28,7 +29,7 @@ class WHMap:
 	def __init__(self):
 		results = []
 		# Read map from .csv
-		with open("map.csv") as csvfile:
+		with open("map2.csv") as csvfile:
 			reader = csv.reader(csvfile)  # change contents to floats
 			for row in reader:  # each row is a list
 				results.append(row)
@@ -36,6 +37,7 @@ class WHMap:
 		self.columns = len(results[0])
 		self.startNodes = []
 		self.goalNodes = []
+		self.targetNodes = []
 		# Create node map
 		self.nodeMap = [None] * self.rows * self.columns
 		for r in range(0, self.rows):
@@ -70,6 +72,8 @@ class WHMap:
 						ngID = r * self.columns + (c+1)
 						if not self.nodeMap[ngID].type == SHELF:
 							self.nodeMap[id].neighbors.append(ngID)
+						elif self.nodeMap[id].type == EMPTY:
+							self.targetNodes.append(id)
 					if r + 1 < self.rows:
 						ngID = (r+1) * self.columns + c
 						if not self.nodeMap[ngID].type == SHELF:
@@ -78,6 +82,8 @@ class WHMap:
 						ngID = r * self.columns + (c-1)
 						if not self.nodeMap[ngID].type == SHELF:
 							self.nodeMap[id].neighbors.append(ngID)
+						elif self.nodeMap[id].type == EMPTY:
+							self.targetNodes.append(id)
 
 		# Sanity prints
 		for n in self.nodeMap:
@@ -111,7 +117,10 @@ class WHMap:
 		# Add robots to map
 		for agent in agentQueue:
 			R, C = self.idToRC(agent.nodeLocationID)
-			whMap[R][C] = RED
+			red = list(RED)
+			red[2] = (agent.ID * 35) % 255
+			red[1] = (agent.ID * 10) % 150
+			whMap[R][C] = tuple(red)
 
 		# Display map
 		map_array = np.array(whMap, dtype=np.uint8)
