@@ -3,14 +3,18 @@ import random
 
 class Agent:
 	# Class constructor. id is agent ID, x,y are agents initial position on grid
-	def __init__(self, id, nMap, nID=0, targetID=0):
+	def __init__(self, id, nMap, nID=0, targetID=0, goalID=0):
 		self.ID = id
 		self.nMap = nMap
 		# Starting position of agent
 		self.nodeLocationID = nID
 		# Target location
 		self.targetID = targetID
-		self.tour = self.nMap.biDir_BFS(nID, targetID)
+		# Goal location
+		self.goalID = goalID
+		frntTour = self.nMap.biDir_BFS(nID, targetID)
+		bckTour = self.nMap.biDir_BFS(targetID, goalID)
+		self.tour = frntTour + bckTour
 		print(self.tour)
 
 	# Well-defined position update
@@ -23,11 +27,15 @@ class Agent:
 	def update(self):
 		print("Updating agent position!")
 		if self.tour:
-			self.nodeLocationID = self.tour[0]
-			self.tour.pop(0)
-		elif self.nodeLocationID == self.targetID:
-			# Find new path to a goal node (the first goal node)
-			self.tour = self.nMap.biDir_BFS(self.nodeLocationID, self.nMap.goalNodes[0])
-		elif self.nMap.goalNodes.count(self.nodeLocationID) > 0:
+			nextNode = self.tour[0]
+			if not self.nMap.nodeMap[nextNode].occupied:
+				self.nMap.nodeMap[self.nodeLocationID].occupied = False
+				self.nodeLocationID = nextNode
+				self.nMap.nodeMap[nextNode].occupied = True
+				self.tour.pop(0)
+			elif nextNode == self.targetID and self.nodeLocationID == self.targetID:
+				self.tour.pop(0)
+		elif self.nodeLocationID == self.goalID:
+			self.nMap.nodeMap[self.nodeLocationID].occupied = False
 			return True
 		return False

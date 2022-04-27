@@ -21,6 +21,7 @@ class Node(object):
 		self.id = id
 		self.neighbors = []
 		self.type = None
+		self.occupied = False
 
 
 class WHMap:
