@@ -14,6 +14,14 @@ EMPTY = 'E'
 START = 'S'
 SHELF = 'X'
 GOAL = 'G'
+UP = 'U'
+DOWN = 'D'
+LEFT = 'L'
+RIGHT = 'R'
+
+
+def emptyTypeNode(nodeType):
+	return nodeType == UP or nodeType == DOWN or nodeType == LEFT or nodeType == RIGHT
 
 
 class Node(object):
@@ -29,7 +37,7 @@ class WHMap:
 	def __init__(self):
 		results = []
 		# Read map from .csv
-		with open("map2.csv") as csvfile:
+		with open("map3.csv") as csvfile:
 			reader = csv.reader(csvfile)  # change contents to floats
 			for row in reader:  # each row is a list
 				results.append(row)
@@ -38,6 +46,7 @@ class WHMap:
 		self.startNodes = []
 		self.goalNodes = []
 		self.targetNodes = []
+		self.oneWayMap = False
 		# Create node map
 		self.nodeMap = [None] * self.rows * self.columns
 		for r in range(0, self.rows):
@@ -47,6 +56,8 @@ class WHMap:
 				node = Node(id)
 				# Set node type
 				node.type = results[r][c]
+				if node.type == UP or node.type == DOWN or node.type == LEFT or node.type == RIGHT:
+					self.oneWayMap = True
 				# Add node to list
 				self.nodeMap[id] = node
 				# Check if this is a start node
@@ -57,33 +68,66 @@ class WHMap:
 				if node.type == GOAL:
 					# Add node to goal node list
 					self.goalNodes.append(id)
-		# Create neighbors list for each node
-		for r in range(0, self.rows):
-			for c in range(0, self.columns):
-				id = r * self.columns + c
-				# Verify this isn't a shelf
-				if not self.nodeMap[id].type == SHELF:
-					# Check each neighbor
-					if r - 1 >= 0:
-						ngID = (r-1) * self.columns + c
-						if not self.nodeMap[ngID].type == SHELF:
-							self.nodeMap[id].neighbors.append(ngID)
-					if c + 1 < self.columns:
-						ngID = r * self.columns + (c+1)
-						if not self.nodeMap[ngID].type == SHELF:
-							self.nodeMap[id].neighbors.append(ngID)
-						elif self.nodeMap[id].type == EMPTY:
-							self.targetNodes.append(id)
-					if r + 1 < self.rows:
-						ngID = (r+1) * self.columns + c
-						if not self.nodeMap[ngID].type == SHELF:
-							self.nodeMap[id].neighbors.append(ngID)
-					if c - 1 >= 0:
-						ngID = r * self.columns + (c-1)
-						if not self.nodeMap[ngID].type == SHELF:
-							self.nodeMap[id].neighbors.append(ngID)
-						elif self.nodeMap[id].type == EMPTY:
-							self.targetNodes.append(id)
+		# If using one-ways map, create special neighbors list
+		if self.oneWayMap:
+			for r in range(0, self.rows):
+				for c in range(0, self.columns):
+					id = r * self.columns + c
+					# Verify this isn't a shelf
+					if not self.nodeMap[id].type == SHELF:
+						# Check each neighbor
+						if r - 1 >= 0:
+							ngID = (r-1) * self.columns + c
+							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == DOWN and \
+									not self.nodeMap[id].type == DOWN:
+								self.nodeMap[id].neighbors.append(ngID)
+						if c + 1 < self.columns:
+							ngID = r * self.columns + (c+1)
+							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == LEFT and \
+									not self.nodeMap[id].type == LEFT:
+								self.nodeMap[id].neighbors.append(ngID)
+							elif emptyTypeNode(self.nodeMap[id].type):
+								self.targetNodes.append(id)
+						if r + 1 < self.rows:
+							ngID = (r+1) * self.columns + c
+							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == UP and \
+									not self.nodeMap[id].type == UP:
+								self.nodeMap[id].neighbors.append(ngID)
+						if c - 1 >= 0:
+							ngID = r * self.columns + (c-1)
+							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == RIGHT and \
+									not self.nodeMap[id].type == RIGHT:
+								self.nodeMap[id].neighbors.append(ngID)
+							elif emptyTypeNode(self.nodeMap[id].type):
+								self.targetNodes.append(id)
+		else:
+			# Create regular neighbors list for each node
+			for r in range(0, self.rows):
+				for c in range(0, self.columns):
+					id = r * self.columns + c
+					# Verify this isn't a shelf
+					if not self.nodeMap[id].type == SHELF:
+						# Check each neighbor
+						if r - 1 >= 0:
+							ngID = (r-1) * self.columns + c
+							if not self.nodeMap[ngID].type == SHELF:
+								self.nodeMap[id].neighbors.append(ngID)
+						if c + 1 < self.columns:
+							ngID = r * self.columns + (c+1)
+							if not self.nodeMap[ngID].type == SHELF:
+								self.nodeMap[id].neighbors.append(ngID)
+							elif self.nodeMap[id].type == EMPTY:
+								self.targetNodes.append(id)
+						if r + 1 < self.rows:
+							ngID = (r+1) * self.columns + c
+							if not self.nodeMap[ngID].type == SHELF:
+								self.nodeMap[id].neighbors.append(ngID)
+						if c - 1 >= 0:
+							ngID = r * self.columns + (c-1)
+							if not self.nodeMap[ngID].type == SHELF:
+								self.nodeMap[id].neighbors.append(ngID)
+							elif self.nodeMap[id].type == EMPTY:
+								self.targetNodes.append(id)
 
 		# Sanity prints
 		for n in self.nodeMap:
@@ -102,7 +146,8 @@ class WHMap:
 			for c in range(0, self.columns):
 				# Determine what color this node should be
 				id = r * self.columns + c
-				if self.nodeMap[id].type == EMPTY:
+				if self.nodeMap[id].type == EMPTY or self.nodeMap[id].type == UP or self.nodeMap[id].type == DOWN or \
+						self.nodeMap[id].type == LEFT or self.nodeMap[id].type == RIGHT:
 					row.append(WHITE)
 				elif self.nodeMap[id].type == SHELF:
 					row.append(BLACK)
