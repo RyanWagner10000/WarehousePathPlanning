@@ -20,6 +20,14 @@ LEFT = 'L'
 RIGHT = 'R'
 
 
+def oppositeMove(moveA, moveB):
+	test1 = (moveA == DOWN and moveB == UP)
+	test2 = (moveA == UP and moveB == DOWN)
+	test3 = (moveA == LEFT and moveB == RIGHT)
+	test4 = (moveA == RIGHT and moveB == LEFT)
+	return test1 or test2 or test3 or test4
+
+
 def emptyTypeNode(nodeType):
 	return nodeType == UP or nodeType == DOWN or nodeType == LEFT or nodeType == RIGHT
 
@@ -79,24 +87,28 @@ class WHMap:
 						if r - 1 >= 0:
 							ngID = (r-1) * self.columns + c
 							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == DOWN and \
-									not self.nodeMap[id].type == DOWN:
+									not self.nodeMap[id].type == DOWN and \
+									not oppositeMove(self.nodeMap[id].type, self.nodeMap[ngID].type):
 								self.nodeMap[id].neighbors.append(ngID)
 						if c + 1 < self.columns:
 							ngID = r * self.columns + (c+1)
 							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == LEFT and \
-									not self.nodeMap[id].type == LEFT:
+									not self.nodeMap[id].type == LEFT and \
+									not oppositeMove(self.nodeMap[id].type, self.nodeMap[ngID].type):
 								self.nodeMap[id].neighbors.append(ngID)
 							elif emptyTypeNode(self.nodeMap[id].type):
 								self.targetNodes.append(id)
 						if r + 1 < self.rows:
 							ngID = (r+1) * self.columns + c
 							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == UP and \
-									not self.nodeMap[id].type == UP:
+									not self.nodeMap[id].type == UP and \
+									not oppositeMove(self.nodeMap[id].type, self.nodeMap[ngID].type):
 								self.nodeMap[id].neighbors.append(ngID)
 						if c - 1 >= 0:
 							ngID = r * self.columns + (c-1)
 							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == RIGHT and \
-									not self.nodeMap[id].type == RIGHT:
+									not self.nodeMap[id].type == RIGHT and \
+									not oppositeMove(self.nodeMap[id].type, self.nodeMap[ngID].type):
 								self.nodeMap[id].neighbors.append(ngID)
 							elif emptyTypeNode(self.nodeMap[id].type):
 								self.targetNodes.append(id)
