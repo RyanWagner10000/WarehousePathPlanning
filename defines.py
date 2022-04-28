@@ -1,4 +1,5 @@
 FILE = "map3.csv"
 BACK_TRACKING = False
 
-TIME_STEPS = 1000
+TIME_STEPS = 500
+MAKE_GIF = False

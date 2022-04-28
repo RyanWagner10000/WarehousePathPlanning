@@ -2,6 +2,10 @@ from matplotlib import pyplot as plt
 import numpy as np
 import csv
 import defines
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+import imageio
 
 
 # Grid colors
@@ -60,6 +64,8 @@ class WHMap:
 		self.leftNodes = []
 		self.rightNodes = []
 		self.oneWayMap = False
+		self.filenames = []
+		self.counter = 0
 		# Create node map
 		self.nodeMap = [None] * self.rows * self.columns
 		for r in range(0, self.rows):
@@ -195,7 +201,25 @@ class WHMap:
 		# Display map
 		map_array = np.array(whMap, dtype=np.uint8)
 		plt.imshow(map_array, interpolation='nearest')
+		if defines.MAKE_GIF:
+			# Record file
+			fileName = f'{self.counter}.png'
+			self.filenames.append(fileName)
+			# Save frame
+			plt.savefig(fileName)
+			plt.close()
+			self.counter = self.counter + 1
 		plt.pause(0.01)
+
+	def printGIF(self):
+		if defines.MAKE_GIF:
+			with imageio.get_writer('mygif.gif', mode='I') as writer:
+				for filename in self.filenames:
+					image = imageio.imread(filename)
+					writer.append_data(image)
+			# Remove files
+			for filename in set(self.filenames):
+				os.remove(filename)
 
 	def biDir_BFS(self, startID, endID):
 		# print("Find path: ", startID, endID)

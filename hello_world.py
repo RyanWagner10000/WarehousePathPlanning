@@ -39,6 +39,7 @@ if __name__ == '__main__':
 		# Update grid-world display
 		whMap.updateMap(agentQueue)
 
+		print("Competed step: ", i)
 		time.sleep(0.1)
 
 	# Report results
@@ -46,3 +47,6 @@ if __name__ == '__main__':
 	print("Tasks complete: ", tasksComplete)
 	print("Total robot time: ", runningTime)
 	print("Average time: ", runningTime/tasksComplete)
+
+	if defines.MAKE_GIF:
+		whMap.printGIF()
