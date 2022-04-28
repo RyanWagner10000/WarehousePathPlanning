@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 import csv
+import defines
 
 
 # Grid colors
@@ -20,6 +21,14 @@ LEFT = 'L'
 RIGHT = 'R'
 
 
+def oppositeMove(moveA, moveB):
+	test1 = (moveA == DOWN and moveB == UP)
+	test2 = (moveA == UP and moveB == DOWN)
+	test3 = (moveA == LEFT and moveB == RIGHT)
+	test4 = (moveA == RIGHT and moveB == LEFT)
+	return test1 or test2 or test3 or test4
+
+
 def emptyTypeNode(nodeType):
 	return nodeType == UP or nodeType == DOWN or nodeType == LEFT or nodeType == RIGHT
 
@@ -37,7 +46,7 @@ class WHMap:
 	def __init__(self):
 		results = []
 		# Read map from .csv
-		with open("map3.csv") as csvfile:
+		with open(defines.FILE) as csvfile:
 			reader = csv.reader(csvfile)  # change contents to floats
 			for row in reader:  # each row is a list
 				results.append(row)
@@ -46,6 +55,10 @@ class WHMap:
 		self.startNodes = []
 		self.goalNodes = []
 		self.targetNodes = []
+		self.topNodes = []
+		self.bottomNodes = []
+		self.leftNodes = []
+		self.rightNodes = []
 		self.oneWayMap = False
 		# Create node map
 		self.nodeMap = [None] * self.rows * self.columns
@@ -79,24 +92,28 @@ class WHMap:
 						if r - 1 >= 0:
 							ngID = (r-1) * self.columns + c
 							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == DOWN and \
-									not self.nodeMap[id].type == DOWN:
+									not self.nodeMap[id].type == DOWN and \
+									not oppositeMove(self.nodeMap[id].type, self.nodeMap[ngID].type):
 								self.nodeMap[id].neighbors.append(ngID)
 						if c + 1 < self.columns:
 							ngID = r * self.columns + (c+1)
 							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == LEFT and \
-									not self.nodeMap[id].type == LEFT:
+									not self.nodeMap[id].type == LEFT and \
+									not oppositeMove(self.nodeMap[id].type, self.nodeMap[ngID].type):
 								self.nodeMap[id].neighbors.append(ngID)
 							elif emptyTypeNode(self.nodeMap[id].type):
 								self.targetNodes.append(id)
 						if r + 1 < self.rows:
 							ngID = (r+1) * self.columns + c
 							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == UP and \
-									not self.nodeMap[id].type == UP:
+									not self.nodeMap[id].type == UP and \
+									not oppositeMove(self.nodeMap[id].type, self.nodeMap[ngID].type):
 								self.nodeMap[id].neighbors.append(ngID)
 						if c - 1 >= 0:
 							ngID = r * self.columns + (c-1)
 							if not self.nodeMap[ngID].type == SHELF and not self.nodeMap[ngID].type == RIGHT and \
-									not self.nodeMap[id].type == RIGHT:
+									not self.nodeMap[id].type == RIGHT and \
+									not oppositeMove(self.nodeMap[id].type, self.nodeMap[ngID].type):
 								self.nodeMap[id].neighbors.append(ngID)
 							elif emptyTypeNode(self.nodeMap[id].type):
 								self.targetNodes.append(id)
@@ -128,7 +145,15 @@ class WHMap:
 								self.nodeMap[id].neighbors.append(ngID)
 							elif self.nodeMap[id].type == EMPTY:
 								self.targetNodes.append(id)
-
+						# Check if this is a good node to return to when stuck
+						if r == 0:
+							self.topNodes.append(id)
+						if r == self.rows - 1:
+							self.bottomNodes.append(id)
+						if c == 0:
+							self.leftNodes.append(id)
+						if c == self.columns - 1:
+							self.rightNodes.append(id)
 		# Sanity prints
 		for n in self.nodeMap:
 			print(n.id, " : ", n.neighbors)
@@ -173,7 +198,7 @@ class WHMap:
 		plt.pause(0.01)
 
 	def biDir_BFS(self, startID, endID):
-		print("Find path: ", startID, endID)
+		# print("Find path: ", startID, endID)
 		root = [None] * self.rows * self.columns
 		for r in range(0, len(root)):
 			root[r] = -1
@@ -184,31 +209,31 @@ class WHMap:
 
 		while queue:
 			n = queue.pop(0)
-			print(n, ":")
+			# print(n, ":")
 
 			for nbr in self.nodeMap[n].neighbors:
-				print(nbr, end=" ")
+				# print(nbr, end=" ")
 				if root[nbr] == -1:
 					root[nbr] = n
 					queue.append(nbr)
 					if nbr == endID:
 						# Found node!
-						print("Found node!")
+						# print("Found node!")
 						queue = []
 						break
-			print("")
+			# print("")
 
 		# Determine resulting tour
 		result = []
 		crNode = endID
 		result.append(crNode)
-		print("Resulting tour:")
-		print(" ", crNode, end=" ")
+		# print("Resulting tour:")
+		# print(" ", crNode, end=" ")
 		while not crNode == startID:
 			crNode = root[crNode]
 			result.insert(0, crNode)
-			print(crNode, end=" ")
+			# print(crNode, end=" ")
 
-		print("")
-		print(result)
+		# print("")
+		# print(result)
 		return result
