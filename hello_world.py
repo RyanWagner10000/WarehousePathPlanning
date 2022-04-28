@@ -21,12 +21,13 @@ if __name__ == '__main__':
 		# Randomly generate new agents
 		rnd = random.random()
 		if rnd < 0.25:
-			# Create a new agent
-			print("Creating new agent ", agentIDs)
-			agentQueue.append(Agent.Agent(agentIDs, whMap, random.choice(whMap.startNodes),
-			                         random.choice(whMap.targetNodes),
-			                         random.choice(whMap.goalNodes)))
-			agentIDs += 1
+			if not defines.BACK_TRACKING or len(agentQueue) < 10:
+				# Create a new agent
+				print("Creating new agent ", agentIDs)
+				agentQueue.append(Agent.Agent(agentIDs, whMap, random.choice(whMap.startNodes),
+				                         random.choice(whMap.targetNodes),
+				                         random.choice(whMap.goalNodes)))
+				agentIDs += 1
 
 		# Run updates on each agent
 		for agent in agentQueue:
