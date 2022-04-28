@@ -1,2 +1,4 @@
-FILE = "map2.csv"
-BACK_TRACKING = True
+FILE = "map3.csv"
+BACK_TRACKING = False
+
+TIME_STEPS = 1000

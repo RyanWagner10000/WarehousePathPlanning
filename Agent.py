@@ -19,6 +19,7 @@ class Agent:
 		self.waiting = False
 		self.foundTarget = False
 		self.backTracking = defines.BACK_TRACKING
+		self.lifeTime = 0
 		# print(self.tour)
 
 	# Well-defined position update
@@ -30,6 +31,7 @@ class Agent:
 
 	def update(self):
 		print("Updating agent position!")
+		self.lifeTime = self.lifeTime + 1
 		if self.tour:
 			nextNode = self.tour[0]
 			if not self.nMap.nodeMap[nextNode].occupied:
