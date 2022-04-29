@@ -19,6 +19,7 @@ class Agent:
 		self.waiting = False
 		self.foundTarget = False
 		self.backTracking = defines.BACK_TRACKING
+		self.dynReplan = defines.DYNAMIC_REPLAN
 		self.lifeTime = 0
 		# print(self.tour)
 
@@ -49,7 +50,7 @@ class Agent:
 					self.waiting = True
 				else:
 					# Got tired of waiting... Plan a new route
-					print("Re-routing old route: ", self.tour)
+					# print("Re-routing old route: ", self.tour)
 					curR, curC = self.nMap.idToRC(self.nodeLocationID)
 					nxtR, nxtC = self.nMap.idToRC(nextNode)
 					rndNode = -1
@@ -62,7 +63,7 @@ class Agent:
 					if curC - nxtC == 1:
 						rndNode = random.choice(self.nMap.rightNodes)
 					if rndNode == -1:
-						print("Random node isn't working...", curR, curC, nxtR, nxtC)
+						# print("Random node isn't working...", curR, curC, nxtR, nxtC)
 						rndNode = random.choice(self.nMap.leftNodes)
 
 					if not self.foundTarget:
@@ -77,7 +78,37 @@ class Agent:
 						segment1 = self.nMap.biDir_BFS(self.nodeLocationID, rndNode)
 						segment2 = self.nMap.biDir_BFS(rndNode, self.goalID)
 					self.tour = segment1 + segment2
-					print(" new route: ", self.tour)
+					# print(" new route: ", self.tour)
+					# Check to see if we are actually in dynamic re-planning
+					if self.dynReplan:
+						# Don't continue to back-track
+						self.backTracking = False
+			elif self.nMap.nodeMap[nextNode].occupied and self.dynReplan:
+				if not self.waiting:
+					self.waiting = True
+				else:
+					rndNum = random.random()
+					if rndNum <= 0.5:
+						# Got tired of waiting... Plan a new route
+						# print("** Re-routing old route: ", self.tour)
+						if not self.foundTarget:
+							# Route to target, then to goal
+							# print(" Plan location -> target -> goal")
+							segment1 = self.nMap.biDir_BFS(self.nodeLocationID, self.targetID, True)
+							segment2 = self.nMap.biDir_BFS(self.targetID, self.goalID, True)
+							if not segment1 == [] and not segment2 == []:
+								self.tour = segment1 + segment2
+							else:
+								self.backTracking = True
+						else:
+							# Route to goal
+							# print(" Plan location -> goal")
+							segment = self.nMap.biDir_BFS(self.nodeLocationID, self.goalID, True)
+							if not segment == []:
+								self.tour = segment
+							else:
+								self.backTracking = True
+
 		elif self.nodeLocationID == self.goalID:
 			self.nMap.nodeMap[self.nodeLocationID].occupied = False
 			return True

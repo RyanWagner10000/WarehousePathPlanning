@@ -221,7 +221,7 @@ class WHMap:
 			for filename in set(self.filenames):
 				os.remove(filename)
 
-	def biDir_BFS(self, startID, endID):
+	def biDir_BFS(self, startID, endID, ignoreOccupied=False):
 		# print("Find path: ", startID, endID)
 		root = [None] * self.rows * self.columns
 		for r in range(0, len(root)):
@@ -238,8 +238,13 @@ class WHMap:
 			for nbr in self.nodeMap[n].neighbors:
 				# print(nbr, end=" ")
 				if root[nbr] == -1:
-					root[nbr] = n
-					queue.append(nbr)
+					if ignoreOccupied:
+						if not self.nodeMap[nbr].occupied:
+							root[nbr] = n
+							queue.append(nbr)
+					else:
+						root[nbr] = n
+						queue.append(nbr)
 					if nbr == endID:
 						# Found node!
 						# print("Found node!")
@@ -255,6 +260,9 @@ class WHMap:
 		# print(" ", crNode, end=" ")
 		while not crNode == startID:
 			crNode = root[crNode]
+			if crNode == -1:
+				# print(" Failed to find path!")
+				return []
 			result.insert(0, crNode)
 			# print(crNode, end=" ")
 
