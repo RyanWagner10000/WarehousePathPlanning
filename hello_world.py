@@ -36,8 +36,9 @@ if __name__ == '__main__':
 				runningTime = runningTime + agent.lifeTime
 				agentQueue.remove(agent)
 
-		# Update grid-world display
-		whMap.updateMap(agentQueue)
+		if defines.SHOW_MAP:
+			# Update grid-world display
+			whMap.updateMap(agentQueue)
 
 		print("Competed step: ", i)
 		time.sleep(0.1)

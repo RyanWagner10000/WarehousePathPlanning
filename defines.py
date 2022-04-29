@@ -1,6 +1,6 @@
-FILE = "map2.csv"
+FILE = "map3.csv"
 BACK_TRACKING = False
-DYNAMIC_REPLAN = True
+DYNAMIC_REPLAN = False
 
 TIME_STEPS = 500
 SHOW_MAP = False
