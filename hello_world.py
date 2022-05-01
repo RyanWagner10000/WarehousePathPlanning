@@ -3,6 +3,7 @@ import Agent
 import random
 import time
 import defines
+import sys
 
 
 if __name__ == '__main__':
@@ -44,6 +45,17 @@ if __name__ == '__main__':
 		time.sleep(0.1)
 
 	# Report results
+	if defines.FILE_PRINT:
+		# Save current standard out setting
+		original_stdout = sys.stdout
+		# Open a file
+		with open('results.txt', 'a') as f:
+			# Set standard out to print to file
+			sys.stdout = f
+			print(tasksComplete, ", ", runningTime, ", ", runningTime/tasksComplete)
+			# Reset standard out
+			sys.stdout = original_stdout
+
 	print("")
 	print("Tasks complete: ", tasksComplete)
 	print("Total robot time: ", runningTime)

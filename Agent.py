@@ -20,6 +20,7 @@ class Agent:
 		self.foundTarget = False
 		self.backTracking = defines.BACK_TRACKING
 		self.dynReplan = defines.DYNAMIC_REPLAN
+		self.contReplan = defines.CONTINUOUS_REPLAN
 		self.lifeTime = 0
 		# print(self.tour)
 
@@ -34,6 +35,23 @@ class Agent:
 		print("Updating agent position!")
 		self.lifeTime = self.lifeTime + 1
 		if self.tour:
+			if self.contReplan and self.lifeTime % 3 == 0:
+				# Replan again
+				if not self.foundTarget:
+					segment1 = self.nMap.biDir_BFS(self.nodeLocationID, self.targetID, True)
+					segment2 = self.nMap.biDir_BFS(self.targetID, self.goalID, True)
+					if not segment1 == [] and not segment2 == []:
+						segment1.pop(0)
+						self.tour = segment1 + segment2
+					else:
+						self.backTracking = True
+				else:
+					seg = self.nMap.biDir_BFS(self.nodeLocationID, self.goalID, True)
+					if not seg == []:
+						seg.pop(0)
+						self.tour = seg
+					else:
+						self.backTracking = True
 			nextNode = self.tour[0]
 			if not self.nMap.nodeMap[nextNode].occupied:
 				self.nMap.nodeMap[self.nodeLocationID].occupied = False
@@ -80,7 +98,7 @@ class Agent:
 					self.tour = segment1 + segment2
 					# print(" new route: ", self.tour)
 					# Check to see if we are actually in dynamic re-planning
-					if self.dynReplan:
+					if self.dynReplan or self.contReplan:
 						# Don't continue to back-track
 						self.backTracking = False
 			elif self.nMap.nodeMap[nextNode].occupied and self.dynReplan:
@@ -108,7 +126,6 @@ class Agent:
 								self.tour = segment
 							else:
 								self.backTracking = True
-
 		elif self.nodeLocationID == self.goalID:
 			self.nMap.nodeMap[self.nodeLocationID].occupied = False
 			return True

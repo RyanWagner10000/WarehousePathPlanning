@@ -123,6 +123,15 @@ class WHMap:
 								self.nodeMap[id].neighbors.append(ngID)
 							elif emptyTypeNode(self.nodeMap[id].type):
 								self.targetNodes.append(id)
+						# Check if this is a good node to return to when stuck
+						if r == 0:
+							self.topNodes.append(id)
+						if r == self.rows - 1:
+							self.bottomNodes.append(id)
+						if c == 0:
+							self.leftNodes.append(id)
+						if c == self.columns - 1:
+							self.rightNodes.append(id)
 		else:
 			# Create regular neighbors list for each node
 			for r in range(0, self.rows):
